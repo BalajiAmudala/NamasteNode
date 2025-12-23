@@ -2,18 +2,36 @@ const express = require("express");
 
 const app = express();
 
-app.get("/users/:userId/books/:bookId", (req, res) => {
-  console.log(req.params);
+const myLogger = function (req, res, next) {
+  console.log("LOGGED");
+  next();
+};
+
+const requestTime = function (req, res, next) {
+  req.requestTime = Date.now();
+  next();
+};
+
+app.use(requestTime);
+
+app.get("/", (req, res) => {
+  let responseText = "Hello world! <br>";
+  responseText += `<small>Requested at : ${req.requestTime}</small>`;
+  res.send(responseText);
 });
 
-app.get(/.*fly$/, (req, res) => {
-  res.send("/.*fly$/");
-});
+// app.get("/users/:userId/books/:bookId", (req, res) => {
+//   console.log(req.params);
+// });
 
-app.get("/flights/:from-:to", (req, res) => {
-  console.log(req.params);
-  res.send("Data received bro !!");
-});
+// app.get(/.*fly$/, (req, res) => {
+//   res.send("/.*fly$/");
+// });
+
+// app.get("/flights/:from-:to", (req, res) => {
+//   console.log(req.params);
+//   res.send("Data received bro !!");
+// });
 
 // app.post("/user", (req, res) => {
 //   res.send("Successfully posted the user data to DB !!!");
