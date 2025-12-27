@@ -1,60 +1,31 @@
 const express = require("express");
+const { connectDB } = require("./config/database");
+require("./config/database");
 
 const app = express();
+const User = require("./model/user");
 
-const myLogger = function (req, res, next) {
-  console.log("LOGGED");
-  next();
-};
+//middlewarer to handle incoming request json data
+app.use(express.json());
 
-const requestTime = function (req, res, next) {
-  req.requestTime = Date.now();
-  next();
-};
-
-app.use(requestTime);
-
-app.get("/", (req, res) => {
-  let responseText = "Hello world! <br>";
-  responseText += `<small>Requested at : ${req.requestTime}</small>`;
-  res.send(responseText);
+app.post("/signup", async (req, res) => {
+  console.log(req.body);
+  //creating a new instance of the user model
+  const user = new User(req.body);
+  try {
+    await user.save();
+    res.send("User added successfully !!");
+  } catch (err) {
+    res.status(400).send("Error saving the user" + err.message);
+  }
 });
-
-// app.get("/users/:userId/books/:bookId", (req, res) => {
-//   console.log(req.params);
-// });
-
-// app.get(/.*fly$/, (req, res) => {
-//   res.send("/.*fly$/");
-// });
-
-// app.get("/flights/:from-:to", (req, res) => {
-//   console.log(req.params);
-//   res.send("Data received bro !!");
-// });
-
-// app.post("/user", (req, res) => {
-//   res.send("Successfully posted the user data to DB !!!");
-// });
-
-// app.delete("/user", (req, res) => {
-//   res.send("Successfully deleted the user Data from DB !!!");
-// });
-
-// app.patch("/user", (req, res) => {
-//   res.send("Updated the user data successfully !");
-// });
-// app.use("/hello", (req, res) => {
-//   res.send("Hello hello hello !!");
-// });
-
-// app.use("/test", (req, res) => {
-//   res.send("test file changes!!");
-// });
-
-// app.use("/", (req, res) => {
-//   res.send("Namaste from Dashboard !!");
-// });
-app.listen(7777, () => {
-  console.log("server is successfully listening on port 7777....");
-});
+connectDB()
+  .then(() => {
+    console.log("Database connection was successfull !");
+    app.listen(7777, () => {
+      console.log("server is successfully listening on port 7777....");
+    });
+  })
+  .catch((err) => {
+    console.error("DB connection is unsuccessfull!");
+  });
