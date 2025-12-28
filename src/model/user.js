@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -10,8 +11,22 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       unique: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address:" + value);
+        }
+      },
     },
-    password: { type: String, required: true, trim: true },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Not a strong password:" + value);
+        }
+      },
+    },
     age: {
       type: Number,
       trim: true,
@@ -22,7 +37,16 @@ const userSchema = new mongoose.Schema(
       },
     },
     gender: { type: String, trim: true },
-    photoUrl: { type: String },
+    photoUrl: {
+      type: String,
+      default:
+        "https://images.pexels.com/photos/28271725/pexels-photo-28271725.jpeg",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid URL:" + value);
+        }
+      },
+    },
     about: { type: String, default: "This is a default about of USER" },
     skills: { type: [String] },
   },

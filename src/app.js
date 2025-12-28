@@ -83,23 +83,42 @@ app.delete("/user", async (req, res) => {
 });
 
 //update the data of the users
-// app.patch("/user", async (req, res) => {
-//   const userId = req.body.userId;
-//   const data = req.body;
-//   try {
-//     await User.findByIdAndUpdate({ _id: userId }, data);
-//     res.send("user updated successfully");
-//   } catch (err) {
-//     res.status(400).send("something went wrong!!");
-//   }
-// });
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const data = req.body;
+  try {
+    const ALLOWED_UPDATES = ["photoUrl", "about", "skills", "password"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Updates not allowed !!");
+    }
+    if (data?.skills?.length > 50) {
+      throw new Error("Not more than 10 skills bro !!");
+    }
+    await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+    res.send("user updated successfully");
+  } catch (err) {
+    res.status(400).send(`Error message: ${err.message}`);
+  }
+});
 
 app.patch("/user", async (req, res) => {
   const emailId = req.body.emailId;
-  console.log(emailId);
+  // this req.body is very harmfull , never trust it. Always use proper validators bro !!
   const data = req.body;
-  console.log(data);
   try {
+    const ALLOWED_UPDATES = ["photoUrl", "about", "skills", "password"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Updates not allowed !!");
+    }
     await User.findOneAndUpdate({ emailId: emailId }, data);
     res.send("user updated successfully");
   } catch (err) {
