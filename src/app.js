@@ -4,11 +4,12 @@ require("./config/database");
 const { validateSignUpData } = require("./utils/validation");
 const app = express();
 const User = require("./model/user");
-const bcrypt = require("bcrypt");
+
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
+const { get } = require("mongoose");
 
 //middlewarer to handle incoming request json data
 app.use(express.json());
@@ -48,12 +49,9 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Invalid credentials !!");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await get.validatePassword(password);
     if (isPasswordValid) {
-      //create a JWT token
-      const token = await jwt.sign({ _id: user._id }, "dhanvin09", {
-        expiresIn: "1d",
-      });
+      const token = await user.getJWT();
       //Add the token to cookie and send the response back to the user
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
