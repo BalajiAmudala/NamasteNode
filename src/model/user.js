@@ -60,9 +60,10 @@ userSchema.methods.getJWT = async function () {
   const token = await jwt.sign({ _id: user._id }, "dhanvin09", {
     expiresIn: "7d",
   });
+  return token;
 };
 
-userSchema.methods.validatePassword = async function (passwordInputByUser) {
+userSchema.methods.getValidatePassword = async function (passwordInputByUser) {
   const user = this;
   const passwordHash = user.password;
   //validating password

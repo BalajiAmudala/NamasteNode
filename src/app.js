@@ -4,7 +4,7 @@ require("./config/database");
 const { validateSignUpData } = require("./utils/validation");
 const app = express();
 const User = require("./model/user");
-
+const bcrypt = require("bcrypt");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
@@ -49,7 +49,7 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Invalid credentials !!");
     }
-    const isPasswordValid = await get.validatePassword(password);
+    const isPasswordValid = await user.getValidatePassword(password);
     if (isPasswordValid) {
       const token = await user.getJWT();
       //Add the token to cookie and send the response back to the user
