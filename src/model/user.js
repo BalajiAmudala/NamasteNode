@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
-      unique: true,
+      unique: true, //
       trim: true,
       validate(value) {
         if (!validator.isEmail(value)) {
@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// userSchema.index({ firstName: 1, lastName: 1 });
 userSchema.methods.getJWT = async function () {
   const user = this;
   //create a JWT token
