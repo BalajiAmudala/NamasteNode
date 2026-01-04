@@ -3,10 +3,12 @@ const { connectDB } = require("./config/database");
 require("./config/database");
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 //middlewarer to handle incoming request json data
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
